@@ -1,0 +1,525 @@
+<!DOCTYPE html>  
+<html lang="id">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>XT VPN Panel - Login</title>  
+  <style>  
+    * {  
+      margin: 0;  
+      padding: 0;  
+      box-sizing: border-box;  
+    }  
+  
+    body {  
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;  
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);  
+      min-height: 100vh;  
+      display: flex;  
+      align-items: center;  
+      justify-content: center;  
+      padding: 20px;  
+    }  
+  
+    .login-container {  
+      background: white;  
+      border-radius: 20px;  
+      padding: 40px 32px;  
+      width: 100%;  
+      max-width: 400px;  
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);  
+    }  
+  
+    .login-header {  
+      text-align: center;  
+      margin-bottom: 32px;  
+    }  
+  
+    .login-header h1 {  
+      color: #667eea;  
+      font-size: 26px;  
+      margin-bottom: 8px;  
+      font-weight: 700;  
+    }  
+  
+    .login-header p {  
+      color: #718096;  
+      font-size: 13px;  
+    }  
+  
+    .input-group {  
+      margin-bottom: 18px;  
+    }  
+  
+    .input-group label {  
+      display: block;  
+      margin-bottom: 8px;  
+      color: #2d3748;  
+      font-weight: 600;  
+      font-size: 13px;  
+    }  
+  
+    .input-group input {  
+      width: 100%;  
+      padding: 13px 16px;  
+      border: 2px solid #e2e8f0;  
+      border-radius: 10px;  
+      font-size: 14px;  
+      transition: all 0.3s;  
+    }  
+  
+    .input-group input:focus {  
+      outline: none;  
+      border-color: #667eea;  
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);  
+    }  
+  
+    .btn {  
+      width: 100%;  
+      padding: 14px;  
+      border: none;  
+      border-radius: 10px;  
+      font-size: 15px;  
+      font-weight: 600;  
+      cursor: pointer;  
+      transition: all 0.3s;  
+      position: relative;  
+    }  
+  
+    .btn:disabled {  
+      opacity: 0.6;  
+      cursor: not-allowed;  
+    }  
+  
+    .btn.loading::after {  
+      content: '';  
+      position: absolute;  
+      width: 16px;  
+      height: 16px;  
+      top: 50%;  
+      right: 20px;  
+      margin-top: -8px;  
+      border: 2px solid rgba(255,255,255,0.3);  
+      border-radius: 50%;  
+      border-top-color: white;  
+      animation: spinner 0.6s linear infinite;  
+    }  
+  
+    @keyframes spinner {  
+      to { transform: rotate(360deg); }  
+    }  
+  
+    .btn-primary {  
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);  
+      color: white;  
+    }  
+  
+    .btn-primary:hover:not(:disabled) {  
+      transform: translateY(-2px);  
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);  
+    }  
+  
+    .btn-secondary {  
+      background: #e2e8f0;  
+      color: #4a5568;  
+      margin-top: 10px;  
+    }  
+  
+    .btn-secondary:hover:not(:disabled) {  
+      background: #cbd5e0;  
+    }  
+  
+    .btn-link {  
+      background: none;  
+      color: #667eea;  
+      padding: 8px;  
+      margin-top: 16px;  
+      font-size: 14px;  
+    }  
+  
+    .btn-link:hover:not(:disabled) {  
+      text-decoration: underline;  
+    }  
+  
+    @media (max-width: 480px) {  
+      .login-container {  
+        padding: 32px 24px;  
+      }  
+    }  
+  </style>  
+</head>  
+<body>  
+  <div class="login-container">  
+  <!-- Login Normal -->  
+  <div id="loginBox">  
+    <div class="login-header">  
+      <h1>XT VPN Panel</h1>  
+      <p>Login atau daftar dengan email kamu</p>  
+    </div>  
+    <div class="input-group">  
+      <label>Email</label>  
+      <input type="email" id="email" placeholder="email@example.com">  
+    </div>  
+    <div class="input-group">  
+      <label>Password</label>  
+      <input type="password" id="password" placeholder="Masukkan password">  
+    </div>  
+    <button class="btn btn-primary" id="btnLogin">Login</button>  
+    <button class="btn btn-secondary" id="btnRegisterOtp" style="margin-top:10px;">  
+      Daftar via OTP Email  
+    </button>  
+    <button class="btn btn-link" id="btnForgot">Lupa Password?</button>  
+  </div>  
+  
+  <!-- REGISTER STEP 1: EMAIL + PASSWORD -->  
+  <div id="registerStep1" style="display:none;">  
+    <div class="login-header">  
+      <h1>Daftar Akun</h1>  
+      <p>Masukkan email & password, nanti kami kirim kode OTP ke email kamu</p>  
+    </div>  
+    <div class="input-group">  
+      <label>Email</label>  
+      <input type="email" id="regEmail" placeholder="email@example.com">  
+    </div>  
+    <div class="input-group">  
+      <label>Password</label>  
+      <input type="password" id="regPassword" placeholder="Password untuk login">  
+    </div>  
+    <button class="btn btn-primary" id="btnRegSendCode">Kirim Kode OTP</button>  
+    <button class="btn btn-secondary" id="btnRegBack1">Kembali ke Login</button>  
+  </div>  
+  
+  <!-- REGISTER STEP 2: OTP -->  
+  <div id="registerStep2" style="display:none;">  
+    <div class="login-header">  
+      <h1>Verifikasi OTP</h1>  
+      <p>Masukkan kode OTP yang dikirim ke email kamu</p>  
+    </div>  
+    <div class="input-group">  
+      <label>Kode OTP</label>  
+      <input type="text" id="regCode" placeholder="Kode 6 digit">  
+    </div>  
+    <button class="btn btn-primary" id="btnRegVerify">Verifikasi & Buat Akun</button>  
+    <button class="btn btn-secondary" id="btnRegBack2">Kembali ke Login</button>  
+  </div>  
+  
+  <!-- Reset Step 1: Input Email -->  
+  <div id="resetStep1" style="display:none;">  
+    <div class="login-header">  
+      <h1>Reset Password</h1>  
+      <p>Masukkan email untuk menerima kode reset</p>  
+    </div>  
+    <div class="input-group">  
+      <label>Email</label>  
+      <input type="email" id="resetEmail" placeholder="email@example.com">  
+    </div>  
+    <button class="btn btn-primary" id="btnSendReset">Kirim Kode Reset</button>  
+    <button class="btn btn-secondary" id="btnResetBack1">Kembali ke Login</button>  
+  </div>  
+  
+  <!-- Reset Step 2: Input Kode + Password Baru -->  
+  <div id="resetStep2" style="display:none;">  
+    <div class="login-header">  
+      <h1>Konfirmasi Reset</h1>  
+      <p>Masukkan kode yang dikirim ke email kamu</p>  
+    </div>  
+    <div class="input-group">  
+      <label>Kode Reset</label>  
+      <input type="text" id="resetCode" placeholder="Kode 6 digit">  
+    </div>  
+    <div class="input-group">  
+      <label>Password Baru</label>  
+      <input type="password" id="resetNewPass" placeholder="Password baru">  
+    </div>  
+    <button class="btn btn-primary" id="btnDoReset">Reset Password</button>  
+    <button class="btn btn-secondary" id="btnResetBack2">Kembali ke Login</button>  
+  </div>  
+</div>  
+  
+  <script>  
+  const API_BASE = "/api/web";  
+  
+  let pendingRegister = {  
+    email: "",  
+    password: "",  
+  };  
+  
+  function lockButton(btn, locked) {  
+    if (!btn) return;  
+    btn.disabled = locked;  
+    btn.classList.toggle("loading", !!locked);  
+  }  
+  
+  // auto-redirect kalau sudah login  
+  window.addEventListener("load", () => {  
+    const email = localStorage.getItem("xt_email");  
+    const pass  = localStorage.getItem("xt_pass");  
+    if (email && pass) {  
+      window.location.href = "panel.html";  
+    }  
+  });  
+  
+  function showOnly(boxId) {  
+    const ids = ["loginBox", "registerStep1", "registerStep2", "resetStep1", "resetStep2"];  
+    ids.forEach(id => {  
+      const el = document.getElementById(id);  
+      if (el) el.style.display = (id === boxId ? "block" : "none");  
+    });  
+  }  
+  
+  function showResetStep(step) {  
+    if (step === 0) showOnly("loginBox");  
+    if (step === 1) showOnly("resetStep1");  
+    if (step === 2) showOnly("resetStep2");  
+  }  
+  
+  function showRegisterStep(step) {  
+    if (step === 0) showOnly("loginBox");  
+    if (step === 1) showOnly("registerStep1");  
+    if (step === 2) showOnly("registerStep2");  
+  }  
+  
+  // ======================  
+  // LOGIN NORMAL  
+  // ======================  
+  const btnLogin = document.getElementById("btnLogin");  
+  if (btnLogin) {  
+    btnLogin.addEventListener("click", async (ev) => {  
+      const btn = ev.currentTarget;  
+      const email = document.getElementById("email").value.trim();  
+      const pass = document.getElementById("password").value.trim();  
+  
+      if (!email || !pass) {  
+        alert("Email & password tidak boleh kosong!");  
+        return;  
+      }  
+  
+      lockButton(btn, true);  
+  
+      try {  
+        const res = await fetch(`${API_BASE}/login`, {  
+          method: "POST",  
+          headers: { "Content-Type": "application/json" },  
+          body: JSON.stringify({ email, password: pass }),  
+        });  
+  
+        const json = await res.json().catch(() => ({}));  
+        if (!res.ok || !json.ok) {  
+          throw new Error(json.error || "Gagal login.");  
+        }  
+  
+        localStorage.setItem("xt_email", json.data.email);  
+        localStorage.setItem("xt_pass", pass);  
+  
+        if (json.data.isNew) {  
+          // kalau backend masih auto-register, pesan ini bakal muncul.  
+          alert("Berhasil daftar & login dengan email baru.");  
+        }  
+  
+        window.location.href = "panel.html";  
+      } catch (e) {  
+        alert(e.message || "Gagal login.");  
+      } finally {  
+        lockButton(btn, false);  
+      }  
+    });  
+  }  
+  
+  // ======================  
+  // REGISTER VIA OTP  
+  // ======================  
+  const btnRegisterOtp = document.getElementById("btnRegisterOtp");  
+  if (btnRegisterOtp) {  
+    btnRegisterOtp.onclick = () => {  
+      const emailVal = document.getElementById("email").value.trim();  
+      const passVal  = document.getElementById("password").value.trim();  
+      const regEmail = document.getElementById("regEmail");  
+      const regPass  = document.getElementById("regPassword");  
+  
+      if (regEmail && emailVal) regEmail.value = emailVal;  
+      if (regPass && passVal)  regPass.value  = passVal;  
+  
+      showRegisterStep(1);  
+    };  
+  }  
+  
+  const btnRegBack1 = document.getElementById("btnRegBack1");  
+  if (btnRegBack1) btnRegBack1.onclick = () => showRegisterStep(0);  
+  
+  const btnRegBack2 = document.getElementById("btnRegBack2");  
+  if (btnRegBack2) btnRegBack2.onclick = () => showRegisterStep(0);  
+  
+  // Kirim kode OTP register  
+  const btnRegSendCode = document.getElementById("btnRegSendCode");  
+  if (btnRegSendCode) {  
+    btnRegSendCode.addEventListener("click", async (ev) => {  
+      const btn = ev.currentTarget;  
+      const email = document.getElementById("regEmail").value.trim();  
+      const pass  = document.getElementById("regPassword").value.trim();  
+  
+      if (!email || !pass) {  
+        alert("Email & password wajib diisi.");  
+        return;  
+      }  
+  
+      pendingRegister.email = email;  
+      pendingRegister.password = pass;  
+  
+      lockButton(btn, true);  
+      try {  
+        const res = await fetch(`${API_BASE}/request-register`, {  
+          method: "POST",  
+          headers: { "Content-Type": "application/json" },  
+          body: JSON.stringify({ email, password: pass }),  
+        });  
+        const json = await res.json().catch(() => ({}));  
+        if (!res.ok || !json.ok) {  
+          throw new Error(json.error || "Gagal mengirim kode OTP.");  
+        }  
+  
+        alert("Kode OTP sudah dikirim ke email kamu.");  
+        showRegisterStep(2);  
+      } catch (e) {  
+        alert(e.message || "Gagal mengirim kode OTP.");  
+      } finally {  
+        lockButton(btn, false);  
+      }  
+    });  
+  }  
+  
+  // Verifikasi OTP register  
+  const btnRegVerify = document.getElementById("btnRegVerify");  
+  if (btnRegVerify) {  
+    btnRegVerify.addEventListener("click", async (ev) => {  
+      const btn = ev.currentTarget;  
+      const code = document.getElementById("regCode").value.trim();  
+      const email = pendingRegister.email;  
+      const pass  = pendingRegister.password;  
+  
+      if (!email || !pass) {  
+        alert("Data pendaftaran hilang. Silakan ulangi dari awal.");  
+        showRegisterStep(1);  
+        return;  
+      }  
+      if (!code) {  
+        alert("Kode OTP wajib diisi.");  
+        return;  
+      }  
+  
+      lockButton(btn, true);  
+      try {  
+        const res = await fetch(`${API_BASE}/confirm-register`, {  
+          method: "POST",  
+          headers: { "Content-Type": "application/json" },  
+          body: JSON.stringify({ email, code, password: pass }),  
+        });  
+        const json = await res.json().catch(() => ({}));  
+        if (!res.ok || !json.ok) {  
+          throw new Error(json.error || "Gagal verifikasi OTP.");  
+        }  
+  
+        // simpan login & redirect  
+        localStorage.setItem("xt_email", email);  
+        localStorage.setItem("xt_pass", pass);  
+  
+        alert("Registrasi berhasil, akun sudah aktif. Kamu akan diarahkan ke panel.");  
+        window.location.href = "panel.html";  
+      } catch (e) {  
+        alert(e.message || "Gagal verifikasi OTP.");  
+      } finally {  
+        lockButton(btn, false);  
+      }  
+    });  
+  }  
+  
+  // ======================  
+  // FORGOT PASSWORD  
+  // ======================  
+  const btnForgot = document.getElementById("btnForgot");  
+  if (btnForgot) {  
+    btnForgot.onclick = () => {  
+      const email = document.getElementById("email").value.trim();  
+      const resetEmailInput = document.getElementById("resetEmail");  
+      if (email && resetEmailInput) resetEmailInput.value = email;  
+      showResetStep(1);  
+    };  
+  }  
+  
+  const btnResetBack1 = document.getElementById("btnResetBack1");  
+  if (btnResetBack1) btnResetBack1.onclick = () => showResetStep(0);  
+  const btnResetBack2 = document.getElementById("btnResetBack2");  
+  if (btnResetBack2) btnResetBack2.onclick = () => showResetStep(0);  
+  
+  // Send reset code  
+  const btnSendReset = document.getElementById("btnSendReset");  
+  if (btnSendReset) {  
+    btnSendReset.addEventListener("click", async (ev) => {  
+      const btn = ev.currentTarget;  
+      const email = document.getElementById("resetEmail").value.trim();  
+      if (!email) {  
+        alert("Email tidak boleh kosong.");  
+        return;  
+      }  
+  
+      lockButton(btn, true);  
+      try {  
+        const res = await fetch(`${API_BASE}/request-reset`, {  
+          method: "POST",  
+          headers: { "Content-Type": "application/json" },  
+          body: JSON.stringify({ email }),  
+        });  
+        const json = await res.json().catch(() => ({}));  
+        if (!res.ok || !json.ok) {  
+          throw new Error(json.error || "Gagal mengirim kode reset.");  
+        }  
+  
+        alert("Kode reset sudah dikirim ke email kamu.");  
+        showResetStep(2);  
+      } catch (e) {  
+        alert(e.message || "Gagal mengirim kode reset.");  
+      } finally {  
+        lockButton(btn, false);  
+      }  
+    });  
+  }  
+  
+  // Confirm reset  
+  const btnDoReset = document.getElementById("btnDoReset");  
+  if (btnDoReset) {  
+    btnDoReset.addEventListener("click", async (ev) => {  
+      const btn = ev.currentTarget;  
+      const email = document.getElementById("resetEmail").value.trim();  
+      const code = document.getElementById("resetCode").value.trim();  
+      const newPass = document.getElementById("resetNewPass").value.trim();  
+  
+      if (!email || !code || !newPass) {  
+        alert("Email, kode, dan password baru wajib diisi.");  
+        return;  
+      }  
+  
+      lockButton(btn, true);  
+      try {  
+        const res = await fetch(`${API_BASE}/confirm-reset`, {  
+          method: "POST",  
+          headers: { "Content-Type": "application/json" },  
+          body: JSON.stringify({ email, code, newPassword: newPass }),  
+        });  
+        const json = await res.json().catch(() => ({}));  
+        if (!res.ok || !json.ok) {  
+          throw new Error(json.error || "Gagal reset password.");  
+        }  
+  
+        alert("Password berhasil direset. Silakan login dengan password baru.");  
+        document.getElementById("email").value = email;  
+        document.getElementById("password").value = newPass;  
+        showResetStep(0);  
+      } catch (e) {  
+        alert(e.message || "Gagal reset password.");  
+      } finally {  
+        lockButton(btn, false);  
+      }  
+    });  
+  }  
+</script>  
+</body>  
+</html>  

@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XT VPN Panel - Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard-header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .dashboard-header h2 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-email {
+      color: #4a5568;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 16px;
+      background: #f7fafc;
+      border-radius: 20px;
+    }
+
+    .btn-logout {
+      background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
+    }
+
+    .app-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      padding: 24px;
+      gap: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hamburger {
+      display: none;
+    }
+
+    .app-nav {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      width: 280px;
+      padding: 24px;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .nav-section-title {
+      color: #718096;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      padding-left: 16px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      padding: 14px 18px;
+      border: none;
+      background: transparent;
+      text-align: left;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 15px;
+      color: #4a5568;
+      margin-bottom: 6px;
+      transition: all 0.3s;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-btn::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transform: scaleY(0);
+      transition: transform 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: rgba(102, 126, 234, 0.1);
+      transform: translateX(4px);
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .nav-btn.active::before {
+      transform: scaleY(1);
+    }
+
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      background: transparent;
+      padding: 0;
+    }
+
+    .app-page {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .app-page.active {
+      display: block;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      color: white;
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .page-subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    /* ===== SERVICE CARDS ===== */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .service-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transform: scaleX(0);
+      transition: transform 0.4s;
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 48px rgba(102, 126, 234, 0.2);
+    }
+
+    .service-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .service-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    }
+
+    .service-card h4 {
+      color: #2d3748;
+      margin-bottom: 12px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .service-card p {
+      color: #718096;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: auto;
+      min-height: 60px;
+    }
+
+    .service-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .service-cta,
+    .service-cta-trial {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      flex: 1;
+    }
+
+    .service-cta {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    }
+
+    .service-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    }
+
+    .service-cta-trial {
+      background: linear-gradient(135deg, #f6e05e 0%, #ecc94b 100%);
+      color: #744210;
+      box-shadow: 0 4px 16px rgba(237, 201, 75, 0.3);
+    }
+
+    .service-cta-trial:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(237, 201, 75, 0.4);
+    }
+
+    /* ===== SERVER LIST ===== */
+    #serverList {
+      display: grid;
+      gap: 20px;
+    }
+
+    .server-item {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .server-item:hover {
+      transform: translateX(4px);
+      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+    }
+
+    .server-info h4 {
+      color: #2d3748;
+      font-size: 18px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .server-info p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #718096;
+    }
+
+    .server-status {
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .server-status.online {
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      color: white;
+      box-shadow: 0 4px 16px rgba(72, 187, 120, 0.3);
+    }
+
+    .server-status.offline {
+      background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+      color: white;
+      box-shadow: 0 4px 16px rgba(252, 129, 129, 0.3);
+    }
+
+    /* ===== FORM CONTAINER ===== */
+    .form-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 10px;
+      color: #2d3748;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .input-group input,
+    select {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background: white;
+      color: #2d3748;
+    }
+
+    .input-group input:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      top: 50%;
+      right: 24px;
+      margin-top: -9px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spinner 0.6s linear infinite;
+    }
+
+    @keyframes spinner {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 32px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-trial {
+      background: linear-gradient(135deg, #f6e05e 0%, #ecc94b 100%);
+      color: #744210;
+      box-shadow: 0 6px 24px rgba(237, 201, 75, 0.4);
+    }
+
+    .btn-trial:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 32px rgba(237, 201, 75, 0.5);
+    }
+
+    .btn-outline {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 2px solid #cbd5e0;
+      background: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: #4a5568;
+    }
+
+    .btn-outline:hover {
+      background: #f7fafc;
+      border-color: #667eea;
+      color: #667eea;
+      transform: translateY(-2px);
+    }
+
+    /* ===== PAYMENT CARD ===== */
+    .payment-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      max-width: 700px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .payment-card {
+      display: none;
+      border: 2px solid #667eea;
+      border-radius: 20px;
+      padding: 32px;
+      margin-top: 28px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(247, 250, 252, 0.8) 0%, rgba(237, 242, 247, 0.8) 100%);
+    }
+
+    .payment-card h4 {
+      color: #2d3748;
+      margin-bottom: 16px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .payment-card img {
+      max-width: 320px;
+      width: 100%;
+      margin: 24px 0;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+
+    .payment-card p {
+      color: #4a5568;
+      margin-bottom: 24px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .payment-card a {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s;
+      box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+    }
+
+    .payment-card a:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 32px rgba(102, 126, 234, 0.5);
+    }
+
+    .mini-box {
+      background: #1a202c;
+      color: #e5e7eb;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    .alert-info {
+      background: rgba(102, 126, 234, 0.1);
+      border-left: 4px solid #667eea;
+      padding: 16px 20px;
+      border-radius: 12px;
+      color: #2d3748;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+/* teks kecil yang kamu pakai di HTML */
+    .small {
+      font-size: 13px;
+    }
+
+    .muted {
+      color: #718096;
+    }
+/* Trial Account Card Styles */
+.trial-account-card {
+  max-width: 800px;
+  margin: 20px auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.info-box {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+
+.info-box:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #007bff;
+}
+
+.info-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #007bff;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #007bff;
+}
+
+.info-content {
+  color: #555;
+}
+
+.info-content strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.info-content code {
+  background: #e9ecef;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #d63384;
+  word-break: break-all;
+}
+
+.uuid-code {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background: #28a745;
+  color: white;
+}
+
+.badge-info {
+  background: #17a2b8;
+  color: white;
+}
+
+.badge-warning {
+  background: #ffc107;
+  color: #333;
+}
+
+/* Link Container */
+.link-container {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  margin-top: 8px;
+}
+
+.config-link {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  background: white;
+  resize: vertical;
+  min-height: 60px;
+  max-height: 120px;
+  word-break: break-all;
+  color: #495057;
+}
+
+.config-link:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Copy Button */
+.copy-btn {
+  padding: 10px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.copy-btn:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+}
+
+.copy-btn.copied {
+  background: #28a745;
+}
+
+/* Download Link */
+.download-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #28a745;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  margin-top: 5px;
+}
+
+.download-link:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+  color: white;
+  text-decoration: none;
+}
+
+.download-link:active {
+  transform: translateY(0);
+}
+
+/* Icon Styles (if using FontAwesome) */
+.fas {
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .trial-account-card {
+    padding: 0 10px;
+  }
+
+  .info-box {
+    padding: 12px;
+  }
+
+  .link-container {
+    flex-direction: column;
+  }
+
+  .copy-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .config-link {
+    min-height: 80px;
+  }
+
+  .info-content {
+    font-size: 13px;
+  }
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+  .trial-account-card {
+    color: #e0e0e0;
+  }
+
+  .info-box {
+    background: #2d2d2d;
+    border-color: #444;
+  }
+
+  .info-box:hover {
+    border-color: #0d6efd;
+  }
+
+  .info-title {
+    color: #4dabf7;
+    border-bottom-color: #4dabf7;
+  }
+
+  .info-content {
+    color: #b8b8b8;
+  }
+
+  .info-content strong {
+    color: #e0e0e0;
+  }
+
+  .info-content code {
+    background: #1a1a1a;
+    color: #ff6b9d;
+  }
+
+  .config-link {
+    background: #1a1a1a;
+    border-color: #444;
+    color: #e0e0e0;
+  }
+
+  .config-link:focus {
+    border-color: #4dabf7;
+    box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.2);
+  }
+}
+    /* ===== HASIL TRIAL & HASIL AKUN (THEME UNGU) ===== */
+    #trialResultCard,
+    #topupAccountCard {
+      display: none;
+      margin-top: 24px;
+      border-radius: 24px;
+      padding: 28px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+      border: none;
+      text-align: left;
+    }
+
+    /* header card: judul + tombol "Salin Semua" */
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .result-header h4 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-subtitle {
+      margin-top: 8px;
+      color: rgba(255,255,255,0.85);
+      font-size: 14px;
+    }
+
+    /* tombol outline di header & di bawah */
+    #trialResultCard .btn-outline,
+    #topupAccountCard .btn-outline {
+      border: 2px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.12);
+      color: #ffffff;
+      font-weight: 600;
+      padding: 10px 20px;
+    }
+
+    #trialResultCard .btn-outline:hover,
+    #topupAccountCard .btn-outline:hover {
+      background: rgba(255,255,255,0.25);
+      border-color: #ffffff;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    /* box berisi detail akun */
+    #trialResultContent,
+    #topupAccountContent {
+      margin-top: 16px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.8;
+      font-family: "SF Mono", "Monaco", "Courier New", monospace;
+      overflow-x: auto;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    #trialResultContent b,
+    #topupAccountContent b {
+      color: #a5b4fc;
+      font-weight: 700;
+    }
+
+    #trialResultContent code,
+    #topupAccountContent code {
+      color: #fbbf24;
+      background: rgba(251,191,36,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    /* scrollbar di dalam box result */
+    #trialResultContent::-webkit-scrollbar,
+    #topupAccountContent::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    #trialResultContent::-webkit-scrollbar-track,
+    #topupAccountContent::-webkit-scrollbar-track {
+      background: #0f172a;
+      border-radius: 4px;
+    }
+
+    #trialResultContent::-webkit-scrollbar-thumb,
+    #topupAccountContent::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+
+    #trialResultContent::-webkit-scrollbar-thumb:hover,
+    #topupAccountContent::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+
+    /* Tombol copy individual */
+    #trialCopyButtons {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #trialCopyButtons .btn-outline {
+      flex: 1;
+      min-width: 140px;
+    }
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .app-container {
+        padding: 16px;
+        gap: 16px;
+      }
+
+      .services-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-header {
+        padding: 16px 20px 16px 64px;
+      }
+
+      .hamburger {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+        z-index: 1001;
+      }
+
+      .hamburger span {
+        width: 22px;
+        height: 3px;
+        background: white;
+        display: block;
+        border-radius: 2px;
+        transition: all 0.3s;
+      }
+
+      .user-email {
+        display: none;
+      }
+
+      .app-nav {
+        position: fixed;
+        left: -300px;
+        top: 0;
+        height: 100vh;
+        z-index: 1000;
+        transition: left 0.3s;
+        width: 280px;
+        padding-top: 80px;
+      }
+
+      .app-nav.open {
+        left: 0;
+        box-shadow: 8px 0 32px rgba(0,0,0,0.2);
+      }
+
+      .app-container {
+        flex-direction: column;
+        padding: 12px;
+      }
+
+      .page-title {
+        font-size: 26px;
+      }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .server-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .service-actions {
+        flex-direction: column;
+      }
+
+      .form-container,
+      .payment-container {
+        padding: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-header h2 {
+        font-size: 18px;
+      }
+
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+      }
+
+      .btn-logout {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+
+      .page-title {
+        font-size: 24px;
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(102, 126, 234, 0.5);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(102, 126, 234, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-header">
+    <button class="hamburger" id="btnToggleNav">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="logo-section">
+      <div class="logo-icon">🚀</div>
+      <h2>XT VPN TUNNELING</h2>
+    </div>
+
+    <div class="user-info">
+      <span class="user-email" id="userEmailHeader">-</span>
+      <button class="btn-logout" id="btnLogout">Logout</button>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="app-nav">
+      <button class="nav-btn active" data-target="overview">📊 Overview</button>
+      <button class="nav-btn" data-target="servers">🖥️ Server List</button>
+      <button class="nav-btn" data-target="create">➕ Buat Akun</button>
+      <button class="nav-btn" data-target="trial">✨ Trial Akun</button>
+      <button class="nav-btn" data-target="topup">💳 Pembayaran</button>
+    </nav>
+
+    <!-- Content Area -->
+    <main class="app-content">
+      <!-- OVERVIEW PAGE -->
+      <div id="app-overview" class="app-page active">
+        <h3 class="page-title">Layanan Tersedia</h3>
+        <div class="services-grid">
+          <div class="service-card">
+            <h4>SSH Account</h4>
+            <p>Akses SSH untuk tunneling dan remote server. Support Dropbear, OpenSSH, dan WebSocket.</p>
+            <div class="service-actions">
+              <button class="service-cta" data-create-type="ssh">Buat SSH</button>
+              <button class="service-cta-trial" data-trial-type="ssh">Trial SSH</button>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <h4>VMess Account</h4>
+            <p>V2Ray VMess protocol dengan enkripsi tinggi. Cocok untuk koneksi cepat dan stabil.</p>
+            <div class="service-actions">
+              <button class="service-cta" data-create-type="vmess">Buat VMess</button>
+              <button class="service-cta-trial" data-trial-type="vmess">Trial VMess</button>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <h4>VLess Account</h4>
+            <p>V2Ray VLess protocol tanpa enkripsi tambahan. Performa maksimal untuk streaming.</p>
+            <div class="service-actions">
+              <button class="service-cta" data-create-type="vless">Buat VLess</button>
+              <button class="service-cta-trial" data-trial-type="vless">Trial VLess</button>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <h4>Trojan Account</h4>
+            <p>Trojan-GFW protocol dengan TLS. Bypass filtering internet dengan mudah.</p>
+            <div class="service-actions">
+              <button class="service-cta" data-create-type="trojan">Buat Trojan</button>
+              <button class="service-cta-trial" data-trial-type="trojan">Trial Trojan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVERS PAGE -->
+      <div id="app-servers" class="app-page">
+        <h3 class="page-title">Daftar Server</h3>
+        <div id="serverList">
+          <p class="muted small">Memuat server...</p>
+        </div>
+      </div>
+
+      <!-- CREATE ACCOUNT PAGE -->
+      <div id="app-create" class="app-page">
+        <h3 class="page-title">Buat Akun Baru</h3>
+        <div class="form-container">
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Tipe Akun</label>
+              <select id="createType">
+                <option value="ssh">SSH</option>
+                <option value="vmess">VMess</option>
+                <option value="vless">VLess</option>
+                <option value="trojan">Trojan</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Pilih Server</label>
+              <select id="createServer">
+                <option value="">Memuat server...</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Username</label>
+              <input type="text" id="createUser" placeholder="username-kamu">
+            </div>
+
+            <div class="input-group" id="createPassWrap">
+              <label>Password (Khusus SSH)</label>
+              <input type="password" id="createPass" placeholder="password">
+            </div>
+
+            <div class="input-group">
+              <label>Durasi (Hari)</label>
+              <select id="createDays">
+                <option value="15">15 Hari</option>
+                <option value="30">30 Hari</option>
+              </select>
+            </div>
+
+            <button class="btn btn-primary" id="btnCreate">Buat Akun &amp; Bayar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRIAL PAGE -->
+      <div id="app-trial" class="app-page">
+        <h3 class="page-title">Trial Akun </h3>
+        <div class="form-container">
+          <div class="form-grid">
+            <p class="small muted">
+              Setiap email hanya bisa mengambil trial sekali setiap <b>2 hari</b>.
+            </p>
+
+            <div class="input-group">
+              <label>Tipe Akun Trial</label>
+              <select id="trialType">
+                <option value="ssh">SSH</option>
+                <option value="vmess">VMess</option>
+                <option value="vless">VLess</option>
+                <option value="trojan">Trojan</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Pilih Server</label>
+              <select id="trialServer">
+                <option value="">Memuat server...</option>
+              </select>
+            </div>
+
+            <button class="btn btn-trial" id="btnTrial">Buat Akun Trial (2 hari sekali)</button>
+          </div>
+        </div>
+
+        <!-- HASIL TRIAL -->
+        <div id="trialResultCard" class="payment-container" style="display:none; margin-top:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+            <h4 style="margin:0;">✅ Trial Berhasil Dibuat</h4>
+            <button type="button" class="btn-outline" onclick="copyTrialAll()">Salin Semua</button>
+          </div>
+
+          <div id="trialResultContent"
+               style="margin-top:12px;
+                      background:#0f172a;
+                      color:#e5e7eb;
+                      border-radius:12px;
+                      padding:16px;
+                      font-size:13px;
+                      line-height:1.6;
+                      overflow-x:auto;">
+          </div>
+
+          <div id="trialCopyButtons"
+               style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          </div>
+        </div>
+      </div>
+
+      <!-- TOPUP / PAYMENT PAGE -->
+      <div id="app-topup" class="app-page">
+        <h3 class="page-title">Pembayaran</h3>
+        <div class="payment-container">
+          <p class="muted">Setelah membuat akun, QR code dan link pembayaran akan muncul di bawah ini.</p>
+
+          <div id="topupPaymentCard" class="payment-card">
+            <h4>Silakan Lakukan Pembayaran</h4>
+            <p id="paymentInfo">-</p>
+            <img id="qrisImage" src="" alt="QR Code" style="display:none;">
+            <br>
+            <a id="paymentLink" href="#" target="_blank" style="display:none;">Buka Link Pembayaran</a>
+          </div>
+
+          <!-- HASIL AKUN SETELAH BAYAR -->
+          <div id="topupAccountCard"
+               class="payment-card"
+               style="margin-top:20px; display:none;">
+            <h4>✅ Akun Berhasil Dibuat</h4>
+            <p class="muted small">
+              Di bawah ini adalah detail akun yang dibuat otomatis setelah pembayaran berhasil.
+            </p>
+            <div id="topupAccountContent"
+                 style="margin-top:12px;
+                        background:#0f172a;
+                        color:#e5e7eb;
+                        border-radius:12px;
+                        padding:16px;
+                        font-size:13px;
+                        line-height:1.6;
+                        overflow-x:auto;">
+            </div>
+            <button type="button"
+                    class="btn-outline"
+                    style="margin-top:12px;"
+                    onclick="copyTopupAll()">
+              Salin Semua
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // =====================================
+    // CONFIG
+    // =====================================
+    const API_BASE = "/api/web";
+const fmtRupiah = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
+
+const ORDER_KEY   = "xt_last_order";          // simpan orderId terakhir
+const ACCOUNT_KEY = "xt_last_paid_account";   // simpan akun yang sudah jadi
+
+let POLL_TIMER = null;
+let LAST_TRIAL_RAW = "";
+let LAST_TRIAL_PARSED = {};
+let LAST_TOPUP_MESSAGE_RAW = "";
+
+// ====== SIMPAN / LOAD AKUN BERDASARKAN EMAIL ======
+function saveLastAccountForEmail(email, html, rawText) {
+  if (!email || !html) return;
+  try {
+    const payload = {
+      email,
+      html,
+      raw: rawText || "",
+      ts: Date.now(),
+    };
+    localStorage.setItem(ACCOUNT_KEY, JSON.stringify(payload));
+  } catch (e) {
+    console.warn("Gagal simpan akun ke localStorage:", e);
+  }
+}
+
+function loadLastAccountForEmail(email) {
+  if (!email) return null;
+  try {
+    const raw = localStorage.getItem(ACCOUNT_KEY);
+    if (!raw) return null;
+
+    const data = JSON.parse(raw);
+    if (!data || data.email !== email) return null; // beda email => jangan dipakai
+
+    // opsional: expired 7 hari
+    const MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+    if (Date.now() - (data.ts || 0) > MAX_AGE) return null;
+
+    return data;
+  } catch (e) {
+    return null;
+  }
+}
+
+function clearLastAccount() {
+  try {
+    localStorage.removeItem(ACCOUNT_KEY);
+  } catch (e) {}
+}
+
+    function lockButton(btn, locked) {
+      if (!btn) return;
+      btn.disabled = locked;
+      btn.classList.toggle("loading", !!locked);
+    }
+/**
+ * Helper function untuk copy text ke clipboard
+ * Digunakan untuk tombol copy pada config link
+ */
+function copyToClipboard(button) {
+  // Cari textarea di parent container
+  const container = button.parentElement;
+  const textarea = container.querySelector('.config-link');
+  
+  if (!textarea) {
+    console.error('Textarea tidak ditemukan');
+    return;
+  }
+
+  // Select dan copy text
+  textarea.select();
+  textarea.setSelectionRange(0, 99999); // Untuk mobile
+  
+  try {
+    // Method modern
+    navigator.clipboard.writeText(textarea.value).then(() => {
+      showCopySuccess(button);
+    }).catch(err => {
+      // Fallback ke method lama
+      document.execCommand('copy');
+      showCopySuccess(button);
+    });
+  } catch (err) {
+    // Fallback ke method lama
+    try {
+      document.execCommand('copy');
+      showCopySuccess(button);
+    } catch (e) {
+      console.error('Gagal copy:', e);
+      showCopyError(button);
+    }
+  }
+}
+
+/**
+ * Tampilkan feedback sukses copy
+ */
+function showCopySuccess(button) {
+  const originalHTML = button.innerHTML;
+  
+  // Ubah tampilan button
+  button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+  button.classList.add('copied');
+  
+  // Kembalikan ke semula setelah 2 detik
+  setTimeout(() => {
+    button.innerHTML = originalHTML;
+    button.classList.remove('copied');
+  }, 2000);
+}
+
+/**
+ * Tampilkan feedback error copy
+ */
+function showCopyError(button) {
+  const originalHTML = button.innerHTML;
+  
+  // Ubah tampilan button
+  button.innerHTML = '<i class="fas fa-times"></i> Failed';
+  button.style.background = '#dc3545';
+  
+  // Kembalikan ke semula setelah 2 detik
+  setTimeout(() => {
+    button.innerHTML = originalHTML;
+    button.style.background = '';
+  }, 2000);
+}
+
+// Export untuk use di module
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { copyToClipboard };
+}
+    // =====================================
+// NAVIGATION + BACK BUTTON
+// =====================================
+const DEFAULT_PAGE = "overview";
+
+function openAppPage(name, options = {}) {
+  const { pushHistory = true, fromPopstate = false } = options;
+
+  // simpan tab terakhir
+  localStorage.setItem("xt_panel_tab", name);
+
+  // show/hide page
+  document.querySelectorAll(".app-page").forEach((p) =>
+    p.classList.remove("active")
+  );
+  const pageEl = document.getElementById("app-" + name);
+  if (pageEl) pageEl.classList.add("active");
+
+  // aktifkan nav
+  document.querySelectorAll(".nav-btn").forEach((btn) =>
+    btn.classList.remove("active")
+  );
+  const activeBtn = document.querySelector(
+    '.nav-btn[data-target="' + name + '"]'
+  );
+  if (activeBtn) activeBtn.classList.add("active");
+
+  // tutup sidebar di HP
+  const nav = document.querySelector(".app-nav");
+  if (nav) nav.classList.remove("open");
+
+  // tambahin ke history biar tombol Back HP pindah tab dulu
+  if (pushHistory && !fromPopstate && history.pushState) {
+    history.pushState({ page: name }, "", "#" + name);
+  }
+}
+
+// Set state awal history
+function initHistory() {
+  const lastTab = localStorage.getItem("xt_panel_tab") || DEFAULT_PAGE;
+
+  // tampilkan dulu tanpa nambah history
+  openAppPage(lastTab, { pushHistory: false });
+
+  // ganti state pertama jadi state panel
+  if (history.replaceState) {
+    history.replaceState({ page: lastTab }, "", "#" + lastTab);
+  }
+}
+
+// Ketika tombol BACK ditekan
+window.addEventListener("popstate", (event) => {
+  const state = event.state;
+
+  if (state && state.page) {
+    // pindah tab TANPA nambah history lagi
+    openAppPage(state.page, { pushHistory: false, fromPopstate: true });
+  } else {
+    // kalau sudah nggak ada state (sudah di index.html / halaman lain),
+    // biarin browser yang handle (boleh keluar)
+  }
+});
+    // =====================================
+    // ORDER STORAGE + POLLING
+    // =====================================
+    function saveLastOrder(orderId, amount) {
+      try {
+        localStorage.setItem(
+          ORDER_KEY,
+          JSON.stringify({ orderId, amount, ts: Date.now() })
+        );
+      } catch (e) {}
+    }
+
+    function loadLastOrder() {
+      try {
+        const raw = localStorage.getItem(ORDER_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function clearLastOrder() {
+      try {
+        localStorage.removeItem(ORDER_KEY);
+      } catch (e) {}
+    }
+
+    function copyText(txt) {
+      if (!txt) return;
+      navigator.clipboard
+        .writeText(txt)
+        .then(() => alert("✅ Berhasil disalin"))
+        .catch(() => alert("Clipboard tidak support di browser ini."));
+    }
+
+    function copyTrialAll() {
+      if (!LAST_TRIAL_RAW) return;
+      copyText(LAST_TRIAL_RAW);
+    }
+
+    function copyTopupAll() {
+      if (!LAST_TOPUP_MESSAGE_RAW) return;
+      copyText(LAST_TOPUP_MESSAGE_RAW);
+    }
+
+    async function pollOrderStatusOnce(orderId) {
+  if (!orderId) return;
+  try {
+    const res = await fetch(
+      `${API_BASE}/order-status?orderId=${encodeURIComponent(orderId)}`
+    );
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.ok) return;
+
+    const data = json.data || {};
+    if (data.status === "paid") {
+      // stop polling
+      if (POLL_TIMER) {
+        clearInterval(POLL_TIMER);
+        POLL_TIMER = null;
+      }
+      clearLastOrder();
+
+      if (data.akun_message && typeof data.akun_message === "string") {
+        const card = document.getElementById("topupAccountCard");
+        const content = document.getElementById("topupAccountContent");
+        if (card && content) {
+          content.innerHTML = data.akun_message;
+
+          LAST_TOPUP_MESSAGE_RAW = data.akun_message
+            .replace(/<br\s*\/?>/gi, "\n")
+            .replace(/<\/p>/gi, "\n\n")
+            .replace(/<[^>]+>/g, "")
+            .trim();
+
+          // 🔥 simpan akun per-email
+          const currentEmail = localStorage.getItem("xt_email") || "";
+          saveLastAccountForEmail(
+            currentEmail,
+            data.akun_message,      // HTML akun
+            LAST_TOPUP_MESSAGE_RAW  // versi plain text
+          );
+
+          card.style.display = "block";
+          card.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          alert(
+            "Akun berhasil dibuat:\n\n" +
+              data.akun_message.replace(/<[^>]+>/g, "")
+          );
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Gagal cek status order:", e);
+  }
+}
+
+    function startOrderPolling(orderId) {
+      if (!orderId) return;
+      if (POLL_TIMER) clearInterval(POLL_TIMER);
+      POLL_TIMER = setInterval(() => pollOrderStatusOnce(orderId), 5000);
+    }
+
+    // =====================================
+    // SERVER LIST
+    // =====================================
+    let cachedServers = [];
+
+    async function loadServersFromApi() {
+      try {
+        const res = await fetch(API_BASE + "/servers");
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.ok) {
+          throw new Error(json.error || "Gagal load server.");
+        }
+
+        cachedServers = json.data || [];
+        renderServers();
+        fillServerSelects();
+      } catch (e) {
+        console.warn("Gagal load servers:", e);
+        const wrap = document.getElementById("serverList");
+        if (wrap) {
+          wrap.innerHTML =
+            "<p class='muted small'>Gagal memuat server.</p>";
+        }
+      }
+    }
+
+    function renderServers() {
+      const wrap = document.getElementById("serverList");
+      if (!wrap) return;
+
+      if (!cachedServers.length) {
+        wrap.innerHTML =
+          "<p class='muted small'>Server kosong / belum disetting di backend.</p>";
+        return;
+      }
+
+      wrap.innerHTML = cachedServers
+        .map((s) => {
+          const isFull = s.penuh;
+          const statusText = isFull ? "PENUH" : "TERSEDIA";
+
+          return `
+            <div class="server-item">
+              <div class="server-info">
+                <h4>${s.nama_server}</h4>
+                <p class="small muted">${s.lokasi} • ${s.isp}</p>
+                <p class="small muted">
+                  Kuota ${s.quota}GB / hari • IP Max ${s.iplimit}
+                </p>
+              </div>
+              <span class="server-status ${isFull ? "offline" : "online"}">
+                ${statusText}
+              </span>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function fillServerSelects() {
+      const selCreate = document.getElementById("createServer");
+      const selTrial  = document.getElementById("trialServer");
+
+      if (!cachedServers.length) {
+        if (selCreate) selCreate.innerHTML = "<option value=''>Server kosong</option>";
+        if (selTrial)  selTrial.innerHTML  = "<option value=''>Server kosong</option>";
+        return;
+      }
+
+      const html = cachedServers
+        .map((s) => `<option value="${s.id}">${s.nama_server}</option>`)
+        .join("");
+
+      if (selCreate) selCreate.innerHTML = html;
+      if (selTrial)  selTrial.innerHTML  = html;
+    }
+
+    // =====================================
+    // PASSWORD FIELD VISIBILITY
+    // =====================================
+    const typeSelect        = document.getElementById("createType");
+    const passwordFieldWrap = document.getElementById("createPassWrap");
+    const trialTypeSelect   = document.getElementById("trialType");
+    const trialPassWrap     = document.getElementById("trialPassWrap");
+
+    function updatePasswordVisibility() {
+      if (!typeSelect || !passwordFieldWrap) return;
+      const t = typeSelect.value.toLowerCase();
+      passwordFieldWrap.style.display = t === "ssh" ? "block" : "none";
+    }
+
+    function updateTrialPasswordVisibility() {
+      if (!trialTypeSelect || !trialPassWrap) return;
+      const t = trialTypeSelect.value.toLowerCase();
+      trialPassWrap.style.display = t === "ssh" ? "block" : "none";
+    }
+
+    // =====================================
+    // TRIAL RESULT + COPY HELPER
+    // =====================================
+    function showTrialResult(messageHtml) {
+      const card    = document.getElementById("trialResultCard");
+      const content = document.getElementById("trialResultContent");
+      const btnBox  = document.getElementById("trialCopyButtons");
+
+      if (!card || !content || !btnBox) {
+        alert(
+          "Trial berhasil dibuat:\n\n" +
+          messageHtml.replace(/<[^>]+>/g, "")
+        );
+        return;
+      }
+
+      LAST_TRIAL_RAW = messageHtml
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<\/p>/gi, "\n\n")
+        .replace(/<[^>]+>/g, "")
+        .trim();
+
+      content.innerHTML = messageHtml;
+
+      const find = (label) => {
+        const r = new RegExp(
+          `<b>${label}<\\/b>\\s*:?\\s*<code>(.*?)<\\/code>`,
+          "i"
+        );
+        const m = messageHtml.match(r);
+        return m ? m[1] : "";
+      };
+
+      LAST_TRIAL_PARSED = {
+        username: find("Username"),
+        password: find("Password"),
+        uuid:     find("UUID"),
+        domain:   find("Domain"),
+      };
+
+      btnBox.innerHTML = "";
+
+      if (LAST_TRIAL_PARSED.username) {
+        btnBox.innerHTML += `
+          <button type="button" class="btn-outline"
+            onclick="copyText('${LAST_TRIAL_PARSED.username}')">
+            Copy Username
+          </button>`;
+      }
+
+      if (LAST_TRIAL_PARSED.password) {
+        btnBox.innerHTML += `
+          <button type="button" class="btn-outline"
+            onclick="copyText('${LAST_TRIAL_PARSED.password}')">
+            Copy Password
+          </button>`;
+      }
+
+      if (LAST_TRIAL_PARSED.uuid) {
+        btnBox.innerHTML += `
+          <button type="button" class="btn-outline"
+            onclick="copyText('${LAST_TRIAL_PARSED.uuid}')">
+            Copy UUID
+          </button>`;
+      }
+
+      card.style.display = "block";
+      card.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    // =====================================
+    // ON LOAD
+    // =====================================
+    window.addEventListener("load", () => {
+  const email = localStorage.getItem("xt_email");
+  const pass  = localStorage.getItem("xt_pass");
+
+  if (!email || !pass) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const headerEmailEl = document.getElementById("userEmailHeader");
+  if (headerEmailEl) headerEmailEl.innerText = email;
+
+  // Logout
+  const btnLogout = document.getElementById("btnLogout");
+  if (btnLogout) {
+    btnLogout.onclick = () => {
+      localStorage.removeItem("xt_email");
+      localStorage.removeItem("xt_pass");
+      localStorage.removeItem("xt_panel_tab");
+      clearLastOrder();
+      clearLastAccount(); // 🔥 bersihkan cache akun
+      window.location.href = "login.html";
+    };
+  }
+
+  // Nav button click
+  document.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.onclick = () => openAppPage(btn.dataset.target);
+  });
+
+  // Hamburger
+  const btnToggleNav = document.getElementById("btnToggleNav");
+  if (btnToggleNav) {
+    btnToggleNav.onclick = () => {
+      const nav = document.querySelector(".app-nav");
+      if (nav) nav.classList.toggle("open");
+    };
+  }
+
+  // Load server list
+  loadServersFromApi();
+
+  // Password visibility
+  updatePasswordVisibility();
+  if (typeSelect) {
+    typeSelect.addEventListener("change", updatePasswordVisibility);
+  }
+  updateTrialPasswordVisibility();
+  if (trialTypeSelect) {
+    trialTypeSelect.addEventListener("change", updateTrialPasswordVisibility);
+  }
+
+  // Service card → buka tab create/trial
+  document.querySelectorAll(".service-cta").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.createType || "ssh";
+      openAppPage("create");
+      const sel = document.getElementById("createType");
+      if (sel) {
+        sel.value = t;
+        updatePasswordVisibility();
+      }
+    });
+  });
+
+  document.querySelectorAll(".service-cta-trial").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.trialType || "ssh";
+      openAppPage("trial");
+      const sel =
+        document.getElementById("trialType") ||
+        document.getElementById("createType");
+      if (sel) {
+        sel.value = t;
+        updateTrialPasswordVisibility();
+      }
+      const trialBtn = document.getElementById("btnTrial");
+      if (trialBtn) {
+        trialBtn.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+  });
+
+  // CREATE ACCOUNT (PAKASIR)
+  const btnCreate = document.getElementById("btnCreate");
+  if (btnCreate) {
+    btnCreate.onclick = async (ev) => {
+      const btn = ev.currentTarget;
+      const type = document.getElementById("createType").value;
+      const serverId = parseInt(
+        document.getElementById("createServer").value,
+        10
+      );
+      const username = document
+        .getElementById("createUser")
+        .value.trim();
+      const password = document.getElementById("createPass")
+        ? document.getElementById("createPass").value.trim()
+        : "";
+      const days = parseInt(
+        document.getElementById("createDays").value,
+        10
+      );
+      const userEmail = localStorage.getItem("xt_email") || "";
+
+      if (!userEmail) {
+        alert("Kamu harus login terlebih dahulu.");
+        window.location.href = "index.html";
+        return;
+      }
+      if (!serverId || !username || !days) {
+        alert("Lengkapi semua form (server, username, hari).");
+        return;
+      }
+      if (type === "ssh" && !password) {
+        alert("Password SSH wajib diisi untuk akun SSH.");
+        return;
+      }
+      if (days !== 15 && days !== 30) {
+        alert("Untuk panel web hanya tersedia paket 15 atau 30 hari.");
+        return;
+      }
+
+      lockButton(btn, true);
+
+      try {
+        const res = await fetch(API_BASE + "/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: userEmail,
+            type,
+            serverId,
+            username,
+            days,
+            password,
+          }),
+        });
+
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.ok) {
+          throw new Error(json.error || "Gagal membuat order.");
+        }
+
+        const data = json.data || {};
+        const card = document.getElementById("topupPaymentCard");
+        const img = document.getElementById("qrisImage");
+        const infoEl = document.getElementById("paymentInfo");
+        const linkEl = document.getElementById("paymentLink");
+
+        if (card && infoEl) {
+          infoEl.textContent = `Order ID: ${
+            data.orderId || "-"
+          } • Nominal: ${fmtRupiah(data.amount || 0)}`;
+
+          if (img) {
+            let qrUrl =
+              data.qrImageBase64 ||
+              data.qrImageUrl ||
+              data.qrisImageUrl ||
+              data.qr_url ||
+              data.qris_image ||
+              data.qrisImage ||
+              data.qrImage ||
+              "";
+
+            if (
+              qrUrl &&
+              !qrUrl.startsWith("http") &&
+              !qrUrl.startsWith("data:")
+            ) {
+              qrUrl = "data:image/png;base64," + qrUrl;
+            }
+
+            if (qrUrl) {
+              img.src = qrUrl;
+              img.style.display = "block";
+            } else {
+              img.style.display = "none";
+            }
+          }
+
+        if (linkEl) {
+          if (data.paymentUrl) {
+            linkEl.href = data.paymentUrl;
+            linkEl.style.display = "inline-block";
+          } else {
+            linkEl.style.display = "none";
+          }
+        }
+
+        card.style.display = "block";
+      }
+
+        saveLastOrder(data.orderId, data.amount);
+        startOrderPolling(data.orderId);
+
+        openAppPage("topup");
+
+        alert(
+          "Order berhasil dibuat.\nSilakan lakukan pembayaran menggunakan QR / link yang tampil. Akun akan dibuat otomatis setelah pembayaran berhasil."
+        );
+      } catch (e) {
+        alert(e.message || "Gagal membuat order pembayaran.");
+      } finally {
+        lockButton(btn, false);
+      }
+    };
+  }
+
+  // TRIAL ACCOUNT
+  const btnTrial = document.getElementById("btnTrial");
+  if (btnTrial) {
+    btnTrial.onclick = async (ev) => {
+      const btn = ev.currentTarget;
+
+      const userEmail = localStorage.getItem("xt_email") || "";
+      if (!userEmail) {
+        alert("Kamu harus login terlebih dahulu.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const typeEl =
+        document.getElementById("trialType") ||
+        document.getElementById("createType");
+      const serverEl =
+        document.getElementById("trialServer") ||
+        document.getElementById("createServer");
+      const usernameEl =
+        document.getElementById("trialUsername") ||
+        document.getElementById("createUser");
+      const passwordEl =
+        document.getElementById("trialPassword") ||
+        document.getElementById("createPass");
+
+      const type = typeEl ? typeEl.value : "";
+      const serverId = serverEl ? parseInt(serverEl.value, 10) : 0;
+      const username = usernameEl ? usernameEl.value.trim() : "";
+      const password = passwordEl ? passwordEl.value.trim() : "";
+
+      if (!type || !serverId) {
+        alert("Data trial tidak lengkap (tipe / server).");
+        return;
+      }
+
+      lockButton(btn, true);
+      try {
+        const res = await fetch(API_BASE + "/trial", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: userEmail,
+            type,
+            serverId,
+            username,
+            password,
+          }),
+        });
+
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok || !json.ok) {
+          if (res.status === 429 && json.error) {
+            throw new Error(json.error);
+          }
+          throw new Error(json.error || "Gagal membuat akun trial.");
+        }
+
+        const data = json.data || {};
+        if (data.message && typeof data.message === "string") {
+          showTrialResult(data.message);
+        } else {
+          alert(
+            "Trial berhasil dibuat.\n\n" +
+              JSON.stringify(data, null, 2)
+          );
+        }
+      } catch (e) {
+        alert(e.message || "Gagal membuat akun trial.");
+      } finally {
+        lockButton(btn, false);
+      }
+    };
+  }
+
+// Inisialisasi history + tab pertama
+  initHistory();
+
+  // Restore order jika ada
+  const lastOrder = loadLastOrder();
+  if (lastOrder && lastOrder.orderId) {
+    const card = document.getElementById("topupPaymentCard");
+    const infoEl = document.getElementById("paymentInfo");
+    if (card && infoEl) {
+      infoEl.textContent = `Order ID: ${
+        lastOrder.orderId
+      } • Nominal: ${fmtRupiah(lastOrder.amount || 0)}`;
+      card.style.display = "block";
+    }
+    openAppPage("topup");
+    startOrderPolling(lastOrder.orderId);
+  }
+
+// 🔁 RESTORE AKUN TERSIMPAN (KHUSUS EMAIL INI)
+  try {
+    const savedAcc = loadLastAccountForEmail(email);
+    if (savedAcc && savedAcc.html) {
+      const card = document.getElementById("topupAccountCard");
+      const content = document.getElementById("topupAccountContent");
+
+      if (card && content) {
+        content.innerHTML = savedAcc.html;
+        card.style.display = "block";
+
+        LAST_TOPUP_MESSAGE_RAW = (savedAcc.raw || savedAcc.html)
+          .replace(/<br\s*\/?>/gi, "\n")
+          .replace(/<\/p>/gi, "\n\n")
+          .replace(/<[^>]+>/g, "")
+          .trim();
+
+        // buka tab Pembayaran
+        openAppPage("topup");
+      }
+    }
+  } catch (e) {
+    console.warn("Gagal restore akun tersimpan:", e);
+  }
+});
+  </script>
+</body>
+</html>
