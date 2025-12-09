@@ -1,7 +1,8 @@
 // =====================================
 // CONFIG
 // =====================================
-const API_BASE = "/api/web"; // panel & api di domain yang sama
+// DI FRONTEND (GitHub Pages / tesom.rmpremium.cloud)
+const API_BASE = "http://joy.xtrimer.cloud:50123/api/web";
 const fmtRupiah = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
 
 // key utk simpan order terakhir di localStorage
@@ -628,4 +629,5 @@ window.addEventListener("load", () => {
     openAppPage("topup");
     startOrderPolling(lastOrder.orderId);
   }
+
 });
