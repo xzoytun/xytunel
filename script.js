@@ -2,7 +2,7 @@
 // CONFIG
 // =====================================
 // DI FRONTEND (GitHub Pages / tesom.rmpremium.cloud)
-const API_BASE = "https://us2.rmpremium.cloud/api/web";
+const API_BASE = "https://ajs.rmpremium.cloud/api/web";
 const fmtRupiah = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
 
 // key utk simpan order terakhir di localStorage
@@ -631,6 +631,7 @@ window.addEventListener("load", () => {
   }
 
 });
+
 
 
 
